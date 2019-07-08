@@ -1,6 +1,11 @@
 [WIP]
+
+![alt text](https://raw.githubusercontent.com/cyblily/4wal/master/img.png)
+
 # 4wal
 4chan based, pywal dependant, random wallpaper scraper and changer
+
+https://github.com/dylanaraps/pywal
 
 uses 4chan's read only API to find a random post in a random thread on a random page number
 
