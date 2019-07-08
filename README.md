@@ -6,6 +6,7 @@ uses 4chan's read only API to find a random post in a random thread on a random 
 
 # commands
 r <board>  -  set random wallpaper
+clear      -  clears the screen
   
 # TODO:
 add options menu for:
