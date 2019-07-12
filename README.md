@@ -1,16 +1,16 @@
 ![alt text](https://raw.githubusercontent.com/cyblily/4wal/master/img.png)
 
-## 4wal [WIP]
+# 4wal [WIP]
 4chan based random wallpaper scraper and changer
 
 uses 4chan's read only API to find a random post in a random thread on a random page number
 
-# commands
+## commands
 r <board>  -  set random wallpaper
   
 clear      -  clears the screen
   
-# TODO:
+## TODO:
 add options menu for:
   * setting a custom path if desired
   * executing a custom command after wallpaper is saved (to open up from being completely pywal dependant)
