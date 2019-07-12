@@ -5,14 +5,14 @@
 
 uses 4chan's read only API to find a random post in a random thread on a random page number
 
+by default it uses ![pywal](https://github.com/dylanaraps/pywal/), but you can set your own post-download command in the options menu
+
 ## commands
 r <board>  -  set random wallpaper
+  
+o          -  show options menu
   
 clear      -  clears the screen
   
 ## TODO:
-add options menu for:
-  * setting a custom path if desired
-  * executing a custom command after wallpaper is saved (to open up from being completely pywal dependant)
-  * saving files as their uploaded filenames rather than server filename
-  * setting a wallpaper from any board (???)
+* currently sys.exit() is layered and doesn't properly work... needs clean up
