@@ -15,19 +15,19 @@ settings = {
 }
 
 logo = """
-  ▒▒▒▒▒▒            ▒▒▒▒▒▒
-▒▒██████▒▒        ▒▒██████▒▒      \033[91m__        __    __              __\033[0m
-  ▒▒██████▒▒    ▒▒██████▒▒       \033[91m/ /_ __ __/ /   / /_ __ ____ _  / /\033[0m
-▒▒████████▒▒    ▒▒████████▒▒    \033[91m/ /\ V  V / /   / /\ V  V / _` |/ /\033[0m
-  ▒▒▒▒▒▒▒▒        ▒▒▒▒▒▒▒▒     \033[91m/_/  \_/\_/_/   /_/  \_/\_/\__, /_/\033[0m
-                                                          \033[91m|___/\033[0m
-
-      ▒▒▒▒        ▒▒▒▒            \033[91m4wal - 4chan based wallpaper\033[0m
-    ▒▒████▒▒    ▒▒████▒▒               \033[91mscraper and changer\033[0m
-  ▒▒██████▒▒    ▒▒██████▒▒
+  ▒▒▒▒▒▒            ▒▒▒▒▒▒        \033[91m__        __    __              __\033[0m
+▒▒██████▒▒        ▒▒██████▒▒     \033[91m/ /_ __ __/ /   / /_ __ ____ _  / /\033[0m 
+  ▒▒██████▒▒    ▒▒██████▒▒      \033[91m/ /\ V  V / /   / /\ V  V / _` |/ /\033[0m 
+▒▒████████▒▒    ▒▒████████▒▒   \033[91m/_/  \_/\_/_/   /_/  \_/\_/\__, /_/\033[0m 
+  ▒▒▒▒▒▒▒▒        ▒▒▒▒▒▒▒▒                                \033[91m|___/\033[0m
+                                                          
+                                  \033[91m4wal - 4chan based wallpaper\033[0m
+      ▒▒▒▒        ▒▒▒▒                 \033[91mscraper and changer\033[0m
+    ▒▒████▒▒    ▒▒████▒▒               
   ▒▒██████▒▒    ▒▒██████▒▒      \033[91mr <board>  -  set random wallpaper\033[0m
+  ▒▒██████▒▒    ▒▒██████▒▒      \033[91ms <board>  -  select thread [WIP]\033[0m
   ▒▒██▒▒██▒▒    ▒▒██▒▒██▒▒      \033[91mo  -  adjust program options\033[0m
-    ▒▒  ▒▒        ▒▒  ▒▒
+    ▒▒  ▒▒        ▒▒  ▒▒    
 """
 
 logo = logo.replace("█", "\033[92m█\033[0m")
@@ -63,6 +63,31 @@ def main():
             else:
                 print(f"Board '{command[2:]}' invalid." + "\n")
                 main()
+        elif command.startswith("s "):
+            if settings["allow_all_boards"] == True:
+                display_threads(command[2:])
+            elif command[2:] in ["w", "wg"]:
+                display_threads(command[2:])
+            else:
+                print(f"Board '{command[2:]}' invalid." + "\n")
+                main()
+        elif command == "s":
+            try:
+                print("Enter board (/w/, /wg/):")
+                board = input("> ")
+                board = board.lower().strip().replace("/", "")
+                if settings["allow_all_boards"] == True:
+                    print()               
+                    display_threads(board)
+                elif board in ["w", "wg"]:  
+                    print()
+                    display_threads(board)                 
+                else:     
+                    print(f"Board '{board}' invalid." + "\n")
+                    main() 
+            except KeyboardInterrupt:
+                print(logo)           
+                main() 
         elif command == "o":
             list_options()
         elif command == "clear":
@@ -70,17 +95,14 @@ def main():
             main()
         elif command in ["q", "quit", "exit"]:
             sys.stdout.write("\033[H\033[J")
-            sys.exit()
+            sys.exit(0)
         else:
             sys.stdout.write("\x1b[1A")  # clear line if
             sys.stdout.write("\x1b[2K")  # invalid command
             main()
     except KeyboardInterrupt:
         sys.stdout.write("\033[H\033[J")
-        sys.exit()
-    except Exception as err:
-        print("\033[1mError:\033[0m", err)
-        main()
+        sys.exit(0)
 
 
 def list_options():
@@ -166,6 +188,45 @@ def select_option():
         main()
 
 
+def display_threads(board):
+    sys.stdout.write("\033[H\033[J")
+    page_num = 1
+    url = f"https://a.4cdn.org/{board}/{page_num}.json"
+    threads = {}
+    try:
+        response = requests.get(url)
+        page = response.json()
+    except:
+        sys.stdout.write("\r" + f"[-] invalid board '{board}'".ljust(50, " "))
+        print("\n")
+        main()
+    for i in range(15): # num of threads per page
+        for thread in page.values():
+            for post in thread[i].values():
+                try:
+                    title = post[0]["sub"]
+                except:
+                    title = post[0]["com"][:51] + "..."
+                threads[i] = {"url": f"https://boards.4channel.org/{board}" 
+                        + f"/thread/{post[0]['no']}", "title": title}
+    print("\033[91mSelect thread by entering it's corresponding number:")
+    for k, v in threads.items():
+        print("\033[91m" + f"{str(k + 1)}) " + "\033[92m" + v["title"] + "\033[0m")
+    select_thread(threads, board)
+
+
+def select_thread(threads, board):
+    thread = input("> ")
+    try:
+        selection = threads[int(thread) - 1]["url"]
+        thread = selection.split("/")[5]
+        get_random_post(thread, board, True)
+    except:
+        sys.stdout.write("\x1b[1A")  # clear line if
+        sys.stdout.write("\x1b[2K")  # invalid command
+        select_thread(threads, board)
+
+
 def get_random_thread(board):
     sys.stdout.write("\r" + "[+] finding random thread...".ljust(32, " "))
     page_num = randint(1, 10)
@@ -181,15 +242,22 @@ def get_random_thread(board):
         try:
             thread_list = [thread for thread in page.values()]
             thread = choice(thread_list)
-            get_random_post(thread, board)
+            get_random_post(thread, board, False)
         except:
             main()
 
 
-def get_random_post(thread, board):
+def get_random_post(thread, board, selected):
     sys.stdout.write("\r" + "[+] finding random post...".ljust(32, " "))
-    posts = [post for post in thread[randint(0, 14)].values()]
-    url = f"https://a.4cdn.org/{board}/thread/{posts[0][0]['no']}.json"
+    if selected:
+        sys.stdout.write("\033[H\033[J")    
+        print(logo)
+        sys.stdout.write("\r" + "[+] finding random post...".ljust(32, " "))
+        url = f"https://a.4cdn.org/{board}/thread/{thread}.json"
+    else:
+        sys.stdout.write("\r" + "[+] finding random post...".ljust(32, " "))
+        posts = [post for post in thread[randint(0, 14)].values()]
+        url = f"https://a.4cdn.org/{board}/thread/{posts[0][0]['no']}.json"
     response = requests.get(url)
     page = response.json()
     posts = [post for post in page.values()]
