@@ -9,7 +9,9 @@ by default it uses ![pywal](https://github.com/dylanaraps/pywal/), but you can s
 
 ## commands
 r <board>  -  set random wallpaper
-  
+
+s <board>  -  select thread [WIP]
+
 o          -  show options menu
   
 clear      -  clears the screen
