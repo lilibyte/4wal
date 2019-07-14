@@ -25,7 +25,7 @@ logo = """
       ▒▒▒▒        ▒▒▒▒                 \033[91mscraper and changer\033[0m
     ▒▒████▒▒    ▒▒████▒▒               
   ▒▒██████▒▒    ▒▒██████▒▒      \033[91mr <board>  -  set random wallpaper\033[0m
-  ▒▒██████▒▒    ▒▒██████▒▒      \033[91ms <board>  -  select thread [WIP]\033[0m
+  ▒▒██████▒▒    ▒▒██████▒▒      \033[91ms <board>  -  select thread\033[0m
   ▒▒██▒▒██▒▒    ▒▒██▒▒██▒▒      \033[91mo  -  adjust program options\033[0m
     ▒▒  ▒▒        ▒▒  ▒▒    
 """
