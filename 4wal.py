@@ -94,15 +94,15 @@ def main():
             sys.stdout.write("\033[H\033[J")
             main()
         elif command in ["q", "quit", "exit"]:
-            sys.stdout.write("\033[H\033[J")
-            sys.exit(0)
+            print("\033[H\033[J", end="", flush=True)
+            os._exit(0)
         else:
             sys.stdout.write("\x1b[1A")  # clear line if
             sys.stdout.write("\x1b[2K")  # invalid command
             main()
     except KeyboardInterrupt:
-        sys.stdout.write("\033[H\033[J")
-        sys.exit(0)
+        print("\033[H\033[J", end="", flush=True)
+        os._exit(0)
 
 
 def list_options():
@@ -275,16 +275,22 @@ def get_random_post(thread, board, selected):
     response = requests.get(url)
     page = response.json()
     posts = [post for post in page.values()]
-    get_random_pape(posts, board)
+    if selected:
+        get_random_pape(posts, board, True)
+    else:
+        get_random_pape(posts, board, False)
 
 
-def get_random_pape(thread, board):
+def get_random_pape(thread, board, selected):
     posts = choice(thread)
     post = choice(posts)
     try:
         if post["ext"] == ".webm":
             sys.stdout.write("\r" + "[-] file contains invalid ext".ljust(32, " "))
-            get_random_thread(board)
+            if selected:
+                get_random_pape(thread, board, selected)
+            else:
+                get_random_thread(board)
         if settings["server_filenames"] == True:
             filename = str(post["tim"]) + post["ext"]
         elif settings["server_filenames"] == False:
@@ -309,7 +315,10 @@ def get_random_pape(thread, board):
     os.makedirs(path, exist_ok=True)
     if os.path.exists(path + filename):
         sys.stdout.write("\r" + "[-] image file already exists".ljust(32, " "))
-        get_random_thread(board)
+        if selected:
+            get_random_pape(thread, board, selected)
+        else:
+            get_random_thread(board)
     else:
         sys.stdout.write("\r" + "[+] downloading image file...".ljust(32, " "))
         urllib.request.urlretrieve(url, path + filename)
