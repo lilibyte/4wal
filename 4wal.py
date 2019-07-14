@@ -4,7 +4,7 @@ import requests
 import urllib
 import os
 from random import randint, choice
-
+ 
 sys.stdout.write("\033[H\033[J") # clear screen at program start
 
 settings = {
@@ -65,9 +65,9 @@ def main():
                 main()
         elif command.startswith("s "):
             if settings["allow_all_boards"] == True:
-                display_threads(command[2:])
+                display_threads(command[2:], 1)
             elif command[2:] in ["w", "wg"]:
-                display_threads(command[2:])
+                display_threads(command[2:], 1)
             else:
                 print(f"Board '{command[2:]}' invalid." + "\n")
                 main()
@@ -78,10 +78,10 @@ def main():
                 board = board.lower().strip().replace("/", "")
                 if settings["allow_all_boards"] == True:
                     print()               
-                    display_threads(board)
+                    display_threads(board, 1)
                 elif board in ["w", "wg"]:  
                     print()
-                    display_threads(board)                 
+                    display_threads(board, 1)                 
                 else:     
                     print(f"Board '{board}' invalid." + "\n")
                     main() 
@@ -188,9 +188,8 @@ def select_option():
         main()
 
 
-def display_threads(board):
+def display_threads(board, page_num):
     sys.stdout.write("\033[H\033[J")
-    page_num = 1
     url = f"https://a.4cdn.org/{board}/{page_num}.json"
     threads = {}
     try:
@@ -209,22 +208,37 @@ def display_threads(board):
                     title = post[0]["com"][:51] + "..."
                 threads[i] = {"url": f"https://boards.4channel.org/{board}" 
                         + f"/thread/{post[0]['no']}", "title": title}
-    print("\033[91mSelect thread by entering it's corresponding number:")
+    print("\033[91m" + f"[Page {page_num}] Select thread by entering it's "
+        + "corresponding number:")
     for k, v in threads.items():
         print("\033[91m" + f"{str(k + 1)}) " + "\033[92m" + v["title"] + "\033[0m")
-    select_thread(threads, board)
+    
+    if page_num != 10:
+        print("\033[91mNP) " + "\033[92mDisplay next page")
+    if page_num != 1:
+        print("\033[91mPP) " + "\033[92mDisplay previous page")
+    print("\033[91mQ) " + "\033[92mReturn to home\033[0m")
+    select_thread(threads, board, page_num)
 
 
-def select_thread(threads, board):
+def select_thread(threads, board, page_num):
     thread = input("> ")
     try:
+        if thread.lower().strip() == "q":
+            sys.stdout.write("\033[H\033[J")
+            print(logo)
+            main()
+        elif thread.lower().strip() == "np" and page_num != 10:
+            display_threads(board, page_num + 1)
+        elif thread.lower().strip() == "pp" and page_num != 1:
+            display_threads(board, page_num - 1)
         selection = threads[int(thread) - 1]["url"]
         thread = selection.split("/")[5]
         get_random_post(thread, board, True)
     except:
         sys.stdout.write("\x1b[1A")  # clear line if
         sys.stdout.write("\x1b[2K")  # invalid command
-        select_thread(threads, board)
+        select_thread(threads, board, page_num)
 
 
 def get_random_thread(board):
