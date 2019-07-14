@@ -17,6 +17,4 @@ o          -  show options menu
 clear      -  clears the screen
   
 ## TODO:
-fix thread selection stuff:
-  * retry selected thread until a pic is found rather than going to a random one
-* currently sys.exit() is layered and doesn't properly work... needs clean up
+probably more stuff
