@@ -18,6 +18,5 @@ clear      -  clears the screen
   
 ## TODO:
 fix thread selection stuff:
-  * add page incrementing and decrementing options
   * retry selected thread until a pic is found rather than going to a random one
 * currently sys.exit() is layered and doesn't properly work... needs clean up
