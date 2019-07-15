@@ -245,7 +245,6 @@ def get_random_thread(board):
     sys.stdout.write("\r" + "[+] finding random thread...".ljust(32, " "))
     page_num = randint(1, 10)
     url = f"https://a.4cdn.org/{board}/{page_num}.json"
-    print("\n" + url + "\n")
     try:
         response = requests.get(url)
         page = response.json()
