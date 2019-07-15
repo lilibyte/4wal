@@ -245,6 +245,7 @@ def get_random_thread(board):
     sys.stdout.write("\r" + "[+] finding random thread...".ljust(32, " "))
     page_num = randint(1, 10)
     url = f"https://a.4cdn.org/{board}/{page_num}.json"
+    print("\n" + url + "\n")
     try:
         response = requests.get(url)
         page = response.json()
@@ -252,13 +253,9 @@ def get_random_thread(board):
         sys.stdout.write("\r" + f"[-] invalid board '{board}'".ljust(50, " "))
         print("\n")
         main()
-    for i in range(15):  # num of threads per page
-        try:
-            thread_list = [thread for thread in page.values()]
-            thread = choice(thread_list)
-            get_random_post(thread, board, False)
-        except:
-            main()
+    thread_list = [thread for thread in page.values()]
+    thread = choice(thread_list)
+    get_random_post(thread, board, False)
 
 
 def get_random_post(thread, board, selected):
