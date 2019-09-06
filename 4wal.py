@@ -211,8 +211,8 @@ def display_threads(board, page_num):
     print("\033[91m" + f"[Page {page_num}] Select thread by entering it's "
         + "corresponding number:")
     for k, v in threads.items():
-        print("\033[91m" + f"{str(k + 1)}) " + "\033[92m" + v["title"] + "\033[0m")
-    
+        print("\033[91m" + f"{str(k + 1)}) " + "\033[92m" + v["title"] 
+                + "\033[0m")
     if page_num != 10:
         print("\033[91mNP) " + "\033[92mDisplay next page")
     if page_num != 1:
@@ -282,7 +282,8 @@ def get_random_pape(thread, board, selected):
     post = choice(posts)
     try:
         if post["ext"] == ".webm":
-            sys.stdout.write("\r" + "[-] file contains invalid ext".ljust(32, " "))
+            sys.stdout.write("\r" 
+                    + "[-] file contains invalid ext".ljust(32, " "))
             if selected:
                 get_random_pape(thread, board, selected)
             else:
@@ -292,8 +293,12 @@ def get_random_pape(thread, board, selected):
         elif settings["server_filenames"] == False:
             filename = post["filename"] + post["ext"]
     except KeyError:
-        sys.stdout.write("\r" + "[-] post cointains no image file".ljust(32, " "))
-        get_random_thread(board)
+        sys.stdout.write("\r" 
+                + "[-] post cointains no image file".ljust(32, " "))
+        if selected:
+            get_random_pape(thread, board, selected)
+        else:
+            get_random_thread(board)
     try:
         title = posts[0]["sub"]
     except KeyError:
@@ -324,7 +329,8 @@ def get_random_pape(thread, board, selected):
         print("\033[92mThread title:\033[91m", title, "\033[0m")
     print("\033[92mServer filename:\033[91m", str(post["tim"])
             + post["ext"], "\033[0m")
-    print("\033[92mFilename:\033[91m", post["filename"] + post["ext"], "\033[0m")
+    print("\033[92mFilename:\033[91m", post["filename"] + post["ext"], 
+            "\033[0m")
     print("\033[92mResolution:\033[91m", post["w"], "x", post["h"], "\033[0m")
     print("\033[92mURL:\033[91m", url, "\033[0m")
     print()
