@@ -4,15 +4,17 @@ import requests
 import urllib
 import os
 from random import randint, choice
- 
-sys.stdout.write("\033[H\033[J") # clear screen at program start
+
+print("\033[H\033[J", end="", flush=True) # clear screen at program start
 
 settings = {
     "path": "",
     "command": "",
     "server_filenames": True,
     "allow_all_boards": False,
+    "minimum_res": {"w": False, "h": False},
 }
+
 
 logo = """
   ▒▒▒▒▒▒            ▒▒▒▒▒▒        \033[91m__        __    __              __\033[0m
@@ -91,7 +93,7 @@ def main():
         elif command == "o":
             list_options()
         elif command == "clear":
-            sys.stdout.write("\033[H\033[J")
+            print("\033[H\033[J", end="", flush=True)
             main()
         elif command in ["q", "quit", "exit"]:
             print("\033[H\033[J", end="", flush=True)
@@ -127,6 +129,13 @@ def list_options():
         print("  (Currently set to server filenames)")
     else:
         print("  (Currently set to uploaded filenames)")
+    print("\033[92mType \033[91m5 \033[92mto set minimum resolution - "
+            + "format: 1920x1080")
+    if settings["minimum_res"]["w"] and settings["minimum_res"]["h"]:
+        print(f"  (Currently set to {settings['minimum_res']['w']}x"
+                + f"{settings['minimum_res']['h']})")
+    else:
+        print("  (Currently there are no resolution restrictions)")
     print("\033[92mType \033[91mq \033[92mto exit options menu\033[0m")
     select_option()
 
@@ -178,6 +187,24 @@ def select_option():
             settings["server_filenames"] = True
             print("\033[92mNow using server filenames\033[0m\n")
             main()
+    elif command == "5":
+        try: 
+            print("\033[92mEnter desired minimum resolution:")
+            print("  example: 1920x1080\033[0m")
+            res = input("> ").strip().lower()
+            w, h = res.split("x")[0], res.split("x")[1]
+            if not isinstance(w, int) and isinstance(h, int):
+                print("\033[92mInvalid input:", res, "\033[0m\n")
+                list_options()
+            settings["minimum_res"]["w"] = int(w)
+            settings["minimum_res"]["h"] = int(h)
+            print(f"\033[92mNow using minimum resolution {w}x{h}\033[0m\n")
+            main()
+        except KeyboardInterrupt:
+            main()
+        except:
+            print("\033[92mInvalid input:", res, "\033[0m\n")
+            list_options()
     elif command == "q":
         print()
         main()
@@ -189,7 +216,7 @@ def select_option():
 
 
 def display_threads(board, page_num):
-    sys.stdout.write("\033[H\033[J")
+    print("\033[H\033[J", end="", flush=True)
     url = f"https://a.4cdn.org/{board}/{page_num}.json"
     threads = {}
     try:
@@ -225,7 +252,7 @@ def select_thread(threads, board, page_num):
     thread = input("> ")
     try:
         if thread.lower().strip() == "q":
-            sys.stdout.write("\033[H\033[J")
+            print("\033[H\033[J", end="", flush=True)
             print(logo)
             main()
         elif thread.lower().strip() == "np" and page_num != 10:
@@ -248,6 +275,8 @@ def get_random_thread(board):
     try:
         response = requests.get(url)
         page = response.json()
+    except KeyboardInterrupt:
+        main()
     except:
         sys.stdout.write("\r" + f"[-] invalid board '{board}'".ljust(50, " "))
         print("\n")
@@ -260,7 +289,7 @@ def get_random_thread(board):
 def get_random_post(thread, board, selected):
     sys.stdout.write("\r" + "[+] finding random post...".ljust(32, " "))
     if selected:
-        sys.stdout.write("\033[H\033[J")    
+        print("\033[H\033[J", end="", flush=True)
         print(logo)
         sys.stdout.write("\r" + "[+] finding random post...".ljust(32, " "))
         url = f"https://a.4cdn.org/{board}/thread/{thread}.json"
@@ -288,6 +317,15 @@ def get_random_pape(thread, board, selected):
                 get_random_pape(thread, board, selected)
             else:
                 get_random_thread(board)
+        if settings["minimum_res"]["w"] and settings["minimum_res"]["h"]:
+            if post["w"] < settings["minimum_res"]["w"] or \
+               post["h"] < settings["minimum_res"]["h"]:
+                sys.stdout.write("\r" 
+                    + "[-] image resolution too small".ljust(32, " "))
+                if selected:
+                    get_random_pape(thread, board, selected)
+                else:
+                    get_random_thread(board)
         if settings["server_filenames"] == True:
             filename = str(post["tim"]) + post["ext"]
         elif settings["server_filenames"] == False:
@@ -348,3 +386,4 @@ def call_command(img):
 
 if __name__ == "__main__":
     main()
+
