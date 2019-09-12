@@ -249,8 +249,8 @@ def display_threads(board, page_num):
 
 
 def select_thread(threads, board, page_num):
-    thread = input("> ")
     try:
+        thread = input("> ")
         if thread.lower().strip() == "q":
             print("\033[H\033[J", end="", flush=True)
             print(logo)
@@ -259,13 +259,20 @@ def select_thread(threads, board, page_num):
             display_threads(board, page_num + 1)
         elif thread.lower().strip() == "pp" and page_num != 1:
             display_threads(board, page_num - 1)
-        selection = threads[int(thread) - 1]["url"]
-        thread = selection.split("/")[5]
-        get_random_post(thread, board, True)
+        elif thread.lower().strip() in [str(i) for i in range(1, 16)]:
+            selection = threads[int(thread) - 1]["url"]
+            thread = selection.split("/")[5]
+            get_random_post(thread, board, True)
+        else:
+            sys.stdout.write("\x1b[1A")  # clear line if
+            sys.stdout.write("\x1b[2K")  # invalid command
+            select_thread(threads, board, page_num)
+    except KeyboardInterrupt:
+        print("\033[H\033[J", end="", flush=True)
+        print(logo)
+        main()
     except:
-        sys.stdout.write("\x1b[1A")  # clear line if
-        sys.stdout.write("\x1b[2K")  # invalid command
-        select_thread(threads, board, page_num)
+        display_threads(board, page_num)
 
 
 def get_random_thread(board):
