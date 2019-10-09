@@ -1,5 +1,4 @@
 import sys
-import json
 import requests
 import urllib
 import os
@@ -15,21 +14,20 @@ settings = {
     "minimum_res": {"w": False, "h": False},
 }
 
-
 logo = """
   ▒▒▒▒▒▒            ▒▒▒▒▒▒        \033[91m__        __    __              __\033[0m
-▒▒██████▒▒        ▒▒██████▒▒     \033[91m/ /_ __ __/ /   / /_ __ ____ _  / /\033[0m 
-  ▒▒██████▒▒    ▒▒██████▒▒      \033[91m/ /\ V  V / /   / /\ V  V / _` |/ /\033[0m 
-▒▒████████▒▒    ▒▒████████▒▒   \033[91m/_/  \_/\_/_/   /_/  \_/\_/\__, /_/\033[0m 
+▒▒██████▒▒        ▒▒██████▒▒     \033[91m/ /_ __ __/ /   / /_ __ ____ _  / /\033[0m
+  ▒▒██████▒▒    ▒▒██████▒▒      \033[91m/ /\ V  V / /   / /\ V  V / _` |/ /\033[0m
+▒▒████████▒▒    ▒▒████████▒▒   \033[91m/_/  \_/\_/_/   /_/  \_/\_/\__, /_/\033[0m
   ▒▒▒▒▒▒▒▒        ▒▒▒▒▒▒▒▒                                \033[91m|___/\033[0m
-                                                          
+
                                   \033[91m4wal - 4chan based wallpaper\033[0m
       ▒▒▒▒        ▒▒▒▒                 \033[91mscraper and changer\033[0m
-    ▒▒████▒▒    ▒▒████▒▒               
+    ▒▒████▒▒    ▒▒████▒▒
   ▒▒██████▒▒    ▒▒██████▒▒      \033[91mr <board>  -  set random wallpaper\033[0m
   ▒▒██████▒▒    ▒▒██████▒▒      \033[91ms <board>  -  select thread\033[0m
   ▒▒██▒▒██▒▒    ▒▒██▒▒██▒▒      \033[91mo  -  adjust program options\033[0m
-    ▒▒  ▒▒        ▒▒  ▒▒    
+    ▒▒  ▒▒        ▒▒  ▒▒
 """
 
 logo = logo.replace("█", "\033[92m█\033[0m")
@@ -40,25 +38,10 @@ def main():
     try:
         command = input("> ")
         command = command.lower().strip().replace("/", "")
-        if command == "r":
-            try:
-                print("Enter board (/w/, /wg/):")
-                board = input("> ")
-                board = board.lower().strip().replace("/", "")
-                if settings["allow_all_boards"] == True:
-                    print()
-                    get_random_thread(board)
-                elif board in ["w", "wg"]:
-                    print()
-                    get_random_thread(board)
-                else:
-                    print(f"Board '{board}' invalid." + "\n")
-                    main()
-            except KeyboardInterrupt:
-                print(logo)
-                main()
+        if command in ["r", "s"]:
+            parse_input(command)
         elif command.startswith("r "):
-            if settings["allow_all_boards"] == True:
+            if settings["allow_all_boards"]:
                 get_random_thread(command[2:])
             elif command[2:] in ["w", "wg"]:
                 get_random_thread(command[2:])
@@ -66,30 +49,13 @@ def main():
                 print(f"Board '{command[2:]}' invalid." + "\n")
                 main()
         elif command.startswith("s "):
-            if settings["allow_all_boards"] == True:
+            if settings["allow_all_boards"]:
                 display_threads(command[2:], 1)
             elif command[2:] in ["w", "wg"]:
                 display_threads(command[2:], 1)
             else:
                 print(f"Board '{command[2:]}' invalid." + "\n")
                 main()
-        elif command == "s":
-            try:
-                print("Enter board (/w/, /wg/):")
-                board = input("> ")
-                board = board.lower().strip().replace("/", "")
-                if settings["allow_all_boards"] == True:
-                    print()               
-                    display_threads(board, 1)
-                elif board in ["w", "wg"]:  
-                    print()
-                    display_threads(board, 1)                 
-                else:     
-                    print(f"Board '{board}' invalid." + "\n")
-                    main() 
-            except KeyboardInterrupt:
-                print(logo)           
-                main() 
         elif command == "o":
             list_options()
         elif command == "clear":
@@ -107,6 +73,30 @@ def main():
         os._exit(0)
 
 
+def parse_input(command):
+    try:
+        print("Enter board (/w/, /wg/):")
+        board = input("> ")
+        board = board.lower().strip().replace("/", "")
+        print()
+        if settings["allow_all_boards"]:
+            if command == "r":
+                get_random_thread(board)
+            elif command == "s":
+                display_threads(board, 1)
+        elif board in ["w", "wg"]:
+            if command == "r":
+                get_random_thread(board)
+            elif command == "s":
+                display_threads(board, 1)
+        else:
+            print(f"Board '{board}' invalid." + "\n")
+            main()
+    except KeyboardInterrupt:
+        print(logo)
+        main()
+
+
 def list_options():
     print("\033[92mType \033[91m1 \033[92mto edit path")
     if settings["path"]:
@@ -114,26 +104,26 @@ def list_options():
     else:
         print("  (Currently saving to the current working directory)")
     print("\033[92mType \033[91m2 \033[92mto set custom command - "
-            + "MUST CONTAIN '{img}'")
+          + "MUST CONTAIN '{img}'")
     if settings["command"]:
         print(f"  (Current command: {settings['command']})")
     else:
         print("  (Current command: wal -i {img} -q)")
     print("\033[92mType \033[91m3 \033[92mto toggle all boards being available")
-    if settings["allow_all_boards"] == False:
+    if not settings["allow_all_boards"]:
         print("  (Currently off; /w/ and /wg/ being the only allowed boards)")
     else:
         print("  (Currently on; all boards allowed to be searched)")
     print("\033[92mType \033[91m4 \033[92mto toggle server/uploaded filenames")
-    if settings["server_filenames"] == True:
+    if settings["server_filenames"]:
         print("  (Currently set to server filenames)")
     else:
         print("  (Currently set to uploaded filenames)")
     print("\033[92mType \033[91m5 \033[92mto set minimum resolution - "
-            + "format: 1920x1080")
+          + "format: 1920x1080")
     if settings["minimum_res"]["w"] and settings["minimum_res"]["h"]:
         print(f"  (Currently set to {settings['minimum_res']['w']}x"
-                + f"{settings['minimum_res']['h']})")
+              + f"{settings['minimum_res']['h']})")
     else:
         print("  (Currently there are no resolution restrictions)")
     print("\033[92mType \033[91mq \033[92mto exit options menu\033[0m")
@@ -152,7 +142,7 @@ def select_option():
                 path += "/"
             settings["path"] = path
             print("\033[92mUpdated path:", path + "4wal_papers/{board}/",
-                    "\033[0m\n")
+                  "\033[0m\n")
             main()
         except KeyboardInterrupt:
             main()
@@ -170,7 +160,7 @@ def select_option():
         except KeyboardInterrupt:
             main()
     elif command == "3":
-        if settings["allow_all_boards"] == False:
+        if not settings["allow_all_boards"]:
             settings["allow_all_boards"] = True
             print("\033[92mNow allowing all boards\033[0m\n")
             main()
@@ -179,7 +169,7 @@ def select_option():
             print("\033[92mNow only allowing /w/ and /wg/\033[0m\n")
             main()
     elif command == "4":
-        if settings["server_filenames"] == True:
+        if settings["server_filenames"]:
             settings["server_filenames"] = False
             print("\033[92mNow using uploaded filenames\033[0m\n")
             main()
@@ -188,7 +178,7 @@ def select_option():
             print("\033[92mNow using server filenames\033[0m\n")
             main()
     elif command == "5":
-        try: 
+        try:
             print("\033[92mEnter desired minimum resolution:")
             print("  example: 1920x1080\033[0m")
             res = input("> ").strip().lower()
@@ -233,13 +223,13 @@ def display_threads(board, page_num):
                     title = post[0]["sub"]
                 except:
                     title = post[0]["com"][:51] + "..."
-                threads[i] = {"url": f"https://boards.4channel.org/{board}" 
-                        + f"/thread/{post[0]['no']}", "title": title}
+                threads[i] = {"url": f"https://boards.4channel.org/{board}"
+                             + f"/thread/{post[0]['no']}", "title": title}
     print("\033[91m" + f"[Page {page_num}] Select thread by entering it's "
-        + "corresponding number:")
+          + "corresponding number:")
     for k, v in threads.items():
-        print("\033[91m" + f"{str(k + 1)}) " + "\033[92m" + v["title"] 
-                + "\033[0m")
+        print("\033[91m" + f"{str(k + 1)}) " + "\033[92m" + v["title"]
+              + "\033[0m")
     if page_num != 10:
         print("\033[91mNP) " + "\033[92mDisplay next page")
     if page_num != 1:
@@ -318,7 +308,7 @@ def get_random_pape(thread, board, selected):
     post = choice(posts)
     try:
         if post["ext"] == ".webm":
-            sys.stdout.write("\r" 
+            sys.stdout.write("\r"
                     + "[-] file contains invalid ext".ljust(32, " "))
             if selected:
                 get_random_pape(thread, board, selected)
@@ -327,7 +317,7 @@ def get_random_pape(thread, board, selected):
         if settings["minimum_res"]["w"] and settings["minimum_res"]["h"]:
             if post["w"] < settings["minimum_res"]["w"] or \
                post["h"] < settings["minimum_res"]["h"]:
-                sys.stdout.write("\r" 
+                sys.stdout.write("\r"
                     + "[-] image resolution too small".ljust(32, " "))
                 if selected:
                     get_random_pape(thread, board, selected)
@@ -338,7 +328,7 @@ def get_random_pape(thread, board, selected):
         elif settings["server_filenames"] == False:
             filename = post["filename"] + post["ext"]
     except KeyError:
-        sys.stdout.write("\r" 
+        sys.stdout.write("\r"
                 + "[-] post cointains no image file".ljust(32, " "))
         if selected:
             get_random_pape(thread, board, selected)
@@ -374,7 +364,7 @@ def get_random_pape(thread, board, selected):
         print("\033[92mThread title:\033[91m", title, "\033[0m")
     print("\033[92mServer filename:\033[91m", str(post["tim"])
             + post["ext"], "\033[0m")
-    print("\033[92mFilename:\033[91m", post["filename"] + post["ext"], 
+    print("\033[92mFilename:\033[91m", post["filename"] + post["ext"],
             "\033[0m")
     print("\033[92mResolution:\033[91m", post["w"], "x", post["h"], "\033[0m")
     print("\033[92mURL:\033[91m", url, "\033[0m")
