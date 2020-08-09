@@ -1,50 +1,22 @@
-![alt text](https://raw.githubusercontent.com/cyblily/4wal/master/img.png)
+## 4wal 2.0
 
-# 4wal
-4chan based random wallpaper scraper and changer
+Set a random wallpaper from 4chan!
 
-uses 4chan's read only API to find a random post in a random thread on a random page number
+Uses 4chan's read only API to find a random post in a random thread on a random page number
 
-by default it uses ![pywal](https://github.com/dylanaraps/pywal/), but you can set your own post-download command in the options menu
+I completely rewrote the program in one sitting to be more simple because of how bad it was was before
 
-## commands
-r <board>  -  set random wallpaper
-
-s <board>  -  select thread 
-
-o          -  show options menu
-  
-clear      -  clears the screen
-
-## example usage
+## usage
 ```
-set random wallpaper from board wg:
-> r wg
+--board     board to scrape for wallpaper (default: /wg/)
 
-set random board with input prompt for board selection
-> r 
-Enter board (/w/, /wg/):
-> wg
+--command   command to set wallpaper 
 
-select thread to pull wallpaper from on board wg
-> s wg
+--min-res   specify minimum resolution (e.g. 1920x1080) (default: 0x0)
 
-select thread to pull wallpaper from with input prompt for board selection
-> s
-Enter board (/w/, /wg/):
-> wg
+--filename  save file with **user** or **server** filename (default: user)
+
+--path      where to save wallpaper files (default: cwd)
+
+--quiet     silence all output
 ```
-
-## options
-* set image download path (default: cwd)
-
-* set post-image download command (default: wal -i {img} -q)
- 
-* toggle all boards being available for scraping (default: only /w/ and /wg/)
-
-* toggle the usage of server and user uploaded filenames (default: server)
-
-* set minimum resolution (default: no minimum restrictions)
-
-## TODO:
-probably more stuff
