@@ -9,7 +9,9 @@ from urllib import request
 
 
 def default_command():
-    if which("wal") is not None:
+    if which("wpg") is not None:
+        return "wpg -s"
+    elif which("wal") is not None:
         return "wal -q -i"
     elif which("feh") is not None:
         return "feh --bg-fill"
@@ -46,7 +48,7 @@ def get_random_post(thread_post_num):
     if not args.quiet:
         if title: print("\33[1m" + title + "\33[0m")
         print(">> " + post["now"] + " No." + str(post["no"]))
-        print("   " + filename + " " + str(post["w"]) + "x" + str(post["h"]))
+        print("   " + filename + " (" + str(post["w"]) + "x" + str(post["h"]) + ')')
         print("   saved to " + str(args.path))
         print("  \33[90m ██ \33[0m\33[91m ██ \33[0m\33[92m ██ \33[0m\33[93m ██ \33[0m"
               "\33[94m ██ \33[0m\33[95m ██ \33[0m\33[96m ██ \33[0m\33[97m ██  \33[0m")
