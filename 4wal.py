@@ -34,7 +34,7 @@ def get_random_post(thread_post_num):
     title = res["posts"][0].get("sub")
 
     post = choice(res["posts"])
-    while not post.get("ext") or (post["w"] < int(args.min_res.split("x")[0]) or post["h"] < int(args.min_res.split("x")[1])) or post['ext'] not in args.extension:
+    while not post.get("ext") or (post["w"] < int(args.min_res.split("x")[0]) or post["h"] < int(args.min_res.split("x")[1])) or post["ext"] not in args.extension:
         post = choice(res["posts"])
 
     filename = (post["filename"] if args.filename == "user" else str(post["tim"])) + post["ext"]
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--command", metavar="\b", default=default_command(), help="command to set wallpaper")
     parser.add_argument("-m", "--min-res", metavar="\b", default="0x0", help="specify minimum resolution (e.g. 1920x1080)")
     parser.add_argument("-f", "--filename", metavar="\b", choices=["user", "server"], default="user", help="save file with \33[1muser\33[0m or \33[1mserver\33[0m filename")
-    parser.add_argument("-e", "--extension", metavar="\b", default=['.jpg', '.jpeg', '.png'], help="filter by file extension (default: .jpg, .jpeg, .png)")
+    parser.add_argument("-e", "--extension", metavar="\b", default=[".jpg", ".jpeg", ".png"], nargs="+", help="filter by file extension (default: .jpg .jpeg .png)")
     parser.add_argument("-p", "--path", metavar="\b", default=Path.cwd(), help=f"where to save wallpaper files (default: {Path.cwd()}/)")
     parser.add_argument("-q", "--quiet", default=False, action="store_true", help="\b\b\b\bsilence all output")
     args = parser.parse_args()
