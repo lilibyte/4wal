@@ -8,15 +8,21 @@ I completely rewrote the program in one sitting to be more simple because of how
 
 ## usage
 ```
---board     board to scrape for wallpaper (default: /wg/)
+--board        board to scrape for wallpaper (default: /wg/)
 
---command   command to set wallpaper 
+--command      command to set wallpaper 
 
---min-res   specify minimum resolution (e.g. 1920x1080) (default: 0x0)
+--min-res      specify minimum resolution (e.g. 1920x1080) (default: 0x0)
 
---filename  save file with **user** or **server** filename (default: user)
+--filename     save file with **user** or **server** filename (default: user)
 
---path      where to save wallpaper files (default: cwd)
+--path         where to save wallpaper files (default: cwd)
 
---quiet     silence all output
+--quiet        silence all output
+
+--extension    filter by file extension (default: .jpg .jpeg .png)
 ```
+
+## forks
+
+Please have a look at [improvised-explosive-device's fork](https://github.com/improvised-explosive-device/4wal) of 4wal for more features.
